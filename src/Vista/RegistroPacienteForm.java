@@ -8,8 +8,8 @@ import java.awt.*;
  
 /**
  * Ventana (formulario) para registrar un paciente.
- * Etapa 3: se conecta el botón "Guardar" con el PacienteDAO (capa de Luis)
- * para guardar el paciente en la base de datos real.
+ * Tiene los campos del paciente y un botón "Guardar" que llama al
+ * PacienteDAO (capa de Luis) para guardar el paciente en la base de datos.
  *
  * Autor: Álvaro
  */
@@ -18,7 +18,7 @@ public class RegistroPacienteForm extends JFrame {
     private JTextField txtNombre;
     private JTextField txtApellido;
     private JTextField txtDocumento;
-    private JTextField txtFechaNacimiento;
+    private JTextField txtFechaNacimiento; // formato yyyy-MM-dd
     private JTextField txtUsuario;
     private JPasswordField txtContrasena;
     private JButton btnGuardar;
@@ -35,7 +35,7 @@ public class RegistroPacienteForm extends JFrame {
         setTitle("Registro de Paciente - Centro de Salud Ganímedes");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(420, 420);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null); // centra la ventana en la pantalla
         setResizable(false);
     }
  
@@ -85,8 +85,9 @@ public class RegistroPacienteForm extends JFrame {
     }
  
     /**
-     * Toma los datos del formulario, arma un Paciente y lo guarda
-     * llamando al DAO de Luis.
+     * Se ejecuta cuando el usuario hace clic en "Guardar paciente".
+     * Valida los campos, arma un objeto Paciente y llama al DAO que hizo Luis
+     * para guardarlo en la base de datos.
      */
     private void guardarPaciente() {
         String nombre = txtNombre.getText().trim();
@@ -96,18 +97,26 @@ public class RegistroPacienteForm extends JFrame {
         String usuario = txtUsuario.getText().trim();
         String contrasena = new String(txtContrasena.getPassword()).trim();
  
+        // Validación simple: ningún campo puede quedar vacío
+        if (nombre.isEmpty() || apellido.isEmpty() || documento.isEmpty()
+                || fechaNacimiento.isEmpty() || usuario.isEmpty() || contrasena.isEmpty()) {
+            mostrarMensaje("Todos los campos son obligatorios.", true);
+            return;
+        }
+ 
+        // NOTA: aquí se guarda la contraseña tal cual por ahora. Cuando se
+        // implemente el cifrado real, este valor debe pasarse hasheado
+        // antes de mandarlo al DAO, no en texto plano.
         Paciente paciente = new Paciente(nombre, apellido, documento,
                 fechaNacimiento, usuario, contrasena);
  
         boolean guardado = pacienteDAO.registrarPaciente(paciente);
  
         if (guardado) {
-            lblMensaje.setForeground(new Color(0, 100, 0));
-            lblMensaje.setText("  Paciente registrado correctamente.");
+            mostrarMensaje("Paciente registrado correctamente.", false);
             limpiarCampos();
         } else {
-            lblMensaje.setForeground(Color.RED);
-            lblMensaje.setText("  No se pudo registrar el paciente.");
+            mostrarMensaje("No se pudo registrar el paciente. Verifica que el documento no esté repetido.", true);
         }
     }
  
@@ -120,7 +129,14 @@ public class RegistroPacienteForm extends JFrame {
         txtContrasena.setText("");
     }
  
+    private void mostrarMensaje(String texto, boolean esError) {
+        lblMensaje.setForeground(esError ? Color.RED : new Color(0, 100, 0));
+        lblMensaje.setText("  " + texto);
+    }
+ 
     public static void main(String[] args) {
+        // Ejecuta la ventana. Requiere que MySQL esté corriendo y que
+        // la base de datos bd_centrosaludganimedes ya exista.
         SwingUtilities.invokeLater(() -> {
             RegistroPacienteForm form = new RegistroPacienteForm();
             form.setVisible(true);
