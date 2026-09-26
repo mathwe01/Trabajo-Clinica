@@ -1,11 +1,15 @@
 package vista;
  
+import dao.PacienteDAO;
+import modelo.Paciente;
+ 
 import javax.swing.*;
 import java.awt.*;
  
 /**
  * Ventana (formulario) para registrar un paciente.
- * Etapa 2: se agregan los campos y botones (todavía sin conectar al DAO).
+ * Etapa 3: se conecta el botón "Guardar" con el PacienteDAO (capa de Luis)
+ * para guardar el paciente en la base de datos real.
  *
  * Autor: Álvaro
  */
@@ -14,11 +18,13 @@ public class RegistroPacienteForm extends JFrame {
     private JTextField txtNombre;
     private JTextField txtApellido;
     private JTextField txtDocumento;
-    private JTextField txtFechaNacimiento; // formato yyyy-MM-dd
+    private JTextField txtFechaNacimiento;
     private JTextField txtUsuario;
     private JPasswordField txtContrasena;
     private JButton btnGuardar;
     private JLabel lblMensaje;
+ 
+    private final PacienteDAO pacienteDAO = new PacienteDAO();
  
     public RegistroPacienteForm() {
         configurarVentana();
@@ -64,6 +70,7 @@ public class RegistroPacienteForm extends JFrame {
         panel.add(txtContrasena);
  
         btnGuardar = new JButton("Guardar paciente");
+        btnGuardar.addActionListener(e -> guardarPaciente());
         panel.add(btnGuardar);
  
         JButton btnLimpiar = new JButton("Limpiar campos");
@@ -75,6 +82,33 @@ public class RegistroPacienteForm extends JFrame {
  
         add(panel, BorderLayout.CENTER);
         add(lblMensaje, BorderLayout.SOUTH);
+    }
+ 
+    /**
+     * Toma los datos del formulario, arma un Paciente y lo guarda
+     * llamando al DAO de Luis.
+     */
+    private void guardarPaciente() {
+        String nombre = txtNombre.getText().trim();
+        String apellido = txtApellido.getText().trim();
+        String documento = txtDocumento.getText().trim();
+        String fechaNacimiento = txtFechaNacimiento.getText().trim();
+        String usuario = txtUsuario.getText().trim();
+        String contrasena = new String(txtContrasena.getPassword()).trim();
+ 
+        Paciente paciente = new Paciente(nombre, apellido, documento,
+                fechaNacimiento, usuario, contrasena);
+ 
+        boolean guardado = pacienteDAO.registrarPaciente(paciente);
+ 
+        if (guardado) {
+            lblMensaje.setForeground(new Color(0, 100, 0));
+            lblMensaje.setText("  Paciente registrado correctamente.");
+            limpiarCampos();
+        } else {
+            lblMensaje.setForeground(Color.RED);
+            lblMensaje.setText("  No se pudo registrar el paciente.");
+        }
     }
  
     private void limpiarCampos() {
