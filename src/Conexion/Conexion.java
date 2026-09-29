@@ -6,7 +6,11 @@ import java.sql.SQLException;
  
 /**
  * Clase encargada de la conexión Java - MySQL.
- * Esta es la clase que Luis (capa DAO) va a usar para guardar,
+ * Aplica el patrón de diseño SINGLETON: solo existe UNA conexión activa
+ * en toda la aplicación. Si ya está abierta, se reutiliza; si no existe
+ * o se cerró, recién ahí se crea una nueva.
+ *
+ * Esta es la clase que Luis (capa DAO) usa para guardar,
  * buscar y actualizar pacientes en la base de datos.
  *
  * Autor: Mathew
@@ -19,13 +23,36 @@ public class Conexion {
     private static final String USUARIO = "root";
     private static final String CONTRASENA = ""; // cambiar por la de tu MySQL local
  
+    // Única instancia de la conexión que existirá en toda la aplicación
+    private static Connection instancia = null;
+ 
+    // Constructor privado: nadie desde fuera puede crear "new Conexion()"
+    private Conexion() {
+    }
+ 
     /**
-     * Abre y devuelve una nueva conexión a la base de datos.
-     * Use "throws SQLException" para que quien llame a este método
-     * decida cómo manejar el error (esto cuenta como manejo de excepciones
-     * para el punto de Implementación del documento).
+     * Devuelve la única conexión activa (patrón Singleton).
+     * Si no existe todavía o se cerró, crea una nueva; si ya está
+     * abierta, entrega la misma que ya existía.
      */
     public static Connection obtenerConexion() throws SQLException {
-        return DriverManager.getConnection(URL, USUARIO, CONTRASENA);
+        if (instancia == null || instancia.isClosed()) {
+            instancia = DriverManager.getConnection(URL, USUARIO, CONTRASENA);
+        }
+        return instancia;
+    }
+ 
+    /**
+     * Cierra la conexión activa (llamar al finalizar la aplicación).
+     */
+    public static void cerrarConexion() {
+        try {
+            if (instancia != null && !instancia.isClosed()) {
+                instancia.close();
+                instancia = null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
