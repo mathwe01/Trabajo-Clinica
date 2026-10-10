@@ -23,12 +23,13 @@ import java.util.List;
  *
  * Autor: Luis
  */
-public class PacienteDAO {
+public class PacienteDAO implements IPacienteDAO {
  
     /**
      * Guarda (INSERT) un nuevo paciente en la base de datos.
      * @return true si se guardó correctamente, false si hubo un error.
      */
+    @Override
     public boolean registrarPaciente(Paciente p) {
         String sql = "INSERT INTO pacientes (nombre, apellido, documento, "
                 + "fecha_nacimiento, usuario, contrasena_hash) VALUES (?, ?, ?, ?, ?, ?)";
@@ -56,6 +57,7 @@ public class PacienteDAO {
      * Busca un paciente por su número de documento (DNI).
      * @return el Paciente encontrado, o null si no existe o hubo un error.
      */
+    @Override
     public Paciente buscarPorDocumento(String documento) {
         String sql = "SELECT * FROM pacientes WHERE documento = ?";
  
@@ -76,6 +78,7 @@ public class PacienteDAO {
         return null; // no se encontró, o hubo error
     }
  /** Busca un paciente por su nombre de usuario (para el inicio de sesión). */
+@Override
 public Paciente buscarPorUsuario(String usuario) {
     String sql = "SELECT * FROM pacientes WHERE usuario = ?";
     try (Connection con = Conexion.obtenerConexion();
@@ -95,6 +98,7 @@ public Paciente buscarPorUsuario(String usuario) {
      * Actualiza los datos de un paciente ya existente (se identifica por su id).
      * @return true si se actualizó correctamente, false si hubo un error.
      */
+    @Override
     public boolean actualizarPaciente(Paciente p) {
         String sql = "UPDATE pacientes SET nombre = ?, apellido = ?, "
                 + "fecha_nacimiento = ? WHERE id_paciente = ?";
@@ -120,6 +124,7 @@ public Paciente buscarPorUsuario(String usuario) {
      * Devuelve la lista completa de pacientes registrados.
      * Útil para mostrarlos en la interfaz de Álvaro.
      */
+    @Override
     public List<Paciente> listarPacientes() {
         List<Paciente> lista = new ArrayList<>();
         String sql = "SELECT * FROM pacientes";

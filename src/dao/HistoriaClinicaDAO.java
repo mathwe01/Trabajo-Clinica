@@ -17,7 +17,7 @@ import java.sql.SQLException;
  * Relacion en la base de datos: 1 paciente -> 1 historia clinica
  * (id_paciente es UNIQUE en la tabla).
  */
-public class HistoriaClinicaDAO {
+public class HistoriaClinicaDAO implements IHistoriaClinicaDAO {
  
     /**
      * Guarda (INSERT) una nueva historia clinica.
@@ -25,6 +25,7 @@ public class HistoriaClinicaDAO {
      * @return true si se guardo correctamente, false si hubo un error
      *         (por ejemplo, si ese paciente ya tiene una historia clinica).
      */
+    @Override
     public boolean registrarHistoria(HistoriaClinica h) {
         String sql = "INSERT INTO historias_clinicas (id_paciente, fecha, "
                 + "antecedentes, diagnostico, tratamiento) VALUES (?, ?, ?, ?, ?)";
@@ -50,6 +51,7 @@ public class HistoriaClinicaDAO {
      * Busca la historia clinica de un paciente.
      * @return la HistoriaClinica encontrada, o null si no existe o hubo un error.
      */
+    @Override
     public HistoriaClinica buscarPorPaciente(int idPaciente) {
         String sql = "SELECT * FROM historias_clinicas WHERE id_paciente = ?";
  

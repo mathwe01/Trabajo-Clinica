@@ -17,13 +17,14 @@ import java.util.List;
  *
  * Relacion en la base de datos: 1 historia clinica -> muchas atenciones.
  */
-public class AtencionDAO {
+public class AtencionDAO implements IAtencionDAO {
  
     /**
      * Guarda (INSERT) una nueva atencion.
      * La historia clinica (idHistoria) debe existir previamente.
      * @return true si se guardo correctamente, false si hubo un error.
      */
+    @Override
     public boolean registrarAtencion(Atencion a) {
         String sql = "INSERT INTO atenciones (id_historia, fecha, motivo) VALUES (?, ?, ?)";
  
@@ -46,6 +47,7 @@ public class AtencionDAO {
      * Devuelve todas las atenciones de una historia clinica
      * (la lista queda vacia si no hay ninguna o si hubo un error).
      */
+    @Override
     public List<Atencion> listarPorHistoria(int idHistoria) {
         List<Atencion> lista = new ArrayList<>();
         String sql = "SELECT * FROM atenciones WHERE id_historia = ? ORDER BY fecha";
