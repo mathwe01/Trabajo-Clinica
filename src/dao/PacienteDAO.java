@@ -75,7 +75,22 @@ public class PacienteDAO {
         }
         return null; // no se encontró, o hubo error
     }
- 
+ /** Busca un paciente por su nombre de usuario (para el inicio de sesión). */
+public Paciente buscarPorUsuario(String usuario) {
+    String sql = "SELECT * FROM pacientes WHERE usuario = ?";
+    try (Connection con = Conexion.obtenerConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, usuario);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return mapearPaciente(rs);
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al buscar usuario: " + e.getMessage());
+    }
+    return null;
+}
     /**
      * Actualiza los datos de un paciente ya existente (se identifica por su id).
      * @return true si se actualizó correctamente, false si hubo un error.
