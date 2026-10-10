@@ -2,7 +2,7 @@ package vista;
  
 import dao.PacienteDAO;
 import modelo.Paciente;
- 
+import seguridad.SeguridadClave;
 import javax.swing.*;
 import java.awt.*;
  
@@ -104,11 +104,9 @@ public class RegistroPacienteForm extends JFrame {
             return;
         }
  
-        // NOTA: aquí se guarda la contraseña tal cual por ahora. Cuando se
-        // implemente el cifrado real, este valor debe pasarse hasheado
-        // antes de mandarlo al DAO, no en texto plano.
+        // La contraseña se convierte en hash con sal antes de guardarla (Ley N.° 29733)
         Paciente paciente = new Paciente(nombre, apellido, documento,
-                fechaNacimiento, usuario, contrasena);
+                fechaNacimiento, usuario, SeguridadClave.hashear(contrasena));
  
         boolean guardado = pacienteDAO.registrarPaciente(paciente);
  

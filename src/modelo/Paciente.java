@@ -1,7 +1,8 @@
 package modelo;
  
 import dao.PacienteDAO;
- 
+import seguridad.SeguridadClave;
+
 /**
  * Clase modelo Paciente, según el diagrama de clases del proyecto.
  * Atributos: IdPacientes, Nombre, Apellido, Documento, FechaDeNacimiento.
@@ -52,18 +53,14 @@ public class Paciente {
     /**
      * InicioDeSesionDePaciente(): valida el usuario y contraseña ingresados
      * contra los datos guardados en la base de datos.
-     * NOTA: por ahora compara directo contra contrasenaHash; cuando se
-     * implemente el cifrado real de contraseñas, aquí se debe comparar
-     * el hash generado del texto ingresado contra el guardado, no el
-     * texto plano.
-     */
+    */
     public boolean iniciarSesion(String usuarioIngresado, String contrasenaIngresada) {
         Paciente encontrado = pacienteDAO.buscarPorDocumento(this.documento);
         if (encontrado == null) {
             return false;
         }
         return encontrado.getUsuario().equals(usuarioIngresado)
-                && encontrado.getContrasenaHash().equals(contrasenaIngresada);
+                && SeguridadClave.verificar(contrasenaIngresada, encontrado.getContrasenaHash());
     }
  
     /**
