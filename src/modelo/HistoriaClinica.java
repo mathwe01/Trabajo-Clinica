@@ -1,5 +1,7 @@
 package modelo;
  
+import dao.HistoriaClinicaDAO;
+ 
 /**
  * Clase modelo HistoriaClinica, según el diagrama de clases del proyecto.
  * Atributos: IdHistoria, fecha, antecedentes, diagnostico, tratamiento.
@@ -19,6 +21,9 @@ public class HistoriaClinica {
     private String antecedentes;
     private String diagnostico;
     private String tratamiento;
+ 
+    // DAO que se usa para hablar con la base de datos
+    private final HistoriaClinicaDAO historiaDAO = new HistoriaClinicaDAO();
  
     public HistoriaClinica() {
     }
@@ -45,6 +50,28 @@ public class HistoriaClinica {
                 + " | Antecedentes: " + antecedentes
                 + " | Diagnostico: " + diagnostico
                 + " | Tratamiento: " + tratamiento;
+    }
+ 
+    /**
+     * guardarEnBD(): guarda esta historia clinica en la base de datos
+     * (requiere que idPaciente corresponda a un paciente ya registrado).
+     * @return true si se guardo correctamente.
+     */
+    public boolean guardarEnBD() {
+        return historiaDAO.registrarHistoria(this);
+    }
+ 
+    /**
+     * consultarDesdeBD(): trae desde la base de datos la historia clinica
+     * del paciente indicado y devuelve su resumen legible.
+     * @return el resumen, o un mensaje si el paciente no tiene historia.
+     */
+    public static String consultarDesdeBD(int idPaciente) {
+        HistoriaClinica encontrada = new HistoriaClinicaDAO().buscarPorPaciente(idPaciente);
+        if (encontrada == null) {
+            return "El paciente no tiene historia clinica registrada.";
+        }
+        return encontrada.consultarHistoria();
     }
  
     // ---------- Getters y setters ----------

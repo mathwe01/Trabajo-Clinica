@@ -1,5 +1,7 @@
 package modelo;
  
+import dao.AtencionDAO;
+ 
 /**
  * Clase modelo Atencion, según el diagrama de clases del proyecto.
  * Atributos: IdAtencion, Fecha, Motivo.
@@ -16,6 +18,9 @@ public class Atencion {
     private int idHistoria; // relaciona esta atención con una historia clínica
     private String fecha;
     private String motivo;
+ 
+    // DAO que se usa para hablar con la base de datos
+    private final AtencionDAO atencionDAO = new AtencionDAO();
  
     public Atencion() {
     }
@@ -37,6 +42,15 @@ public class Atencion {
         return "Atencion registrada -> Historia #" + idHistoria
                 + " | Fecha: " + fecha
                 + " | Motivo: " + motivo;
+    }
+ 
+    /**
+     * guardarEnBD(): guarda esta atencion en la tabla atenciones
+     * (requiere que idHistoria corresponda a una historia ya registrada).
+     * @return true si se guardo correctamente.
+     */
+    public boolean guardarEnBD() {
+        return atencionDAO.registrarAtencion(this);
     }
  
     // ---------- Getters y setters ----------
