@@ -1,6 +1,6 @@
 package servicio;
  
-import dao.PacienteDAO;
+import dao.IPacienteDAO;
 import modelo.Paciente;
  
 import java.time.LocalDate;
@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
  */
 public class ServicioPacientes {
  
-    private final PacienteDAO pacienteDAO;
+    private final IPacienteDAO pacienteDAO;
  
-    public ServicioPacientes(PacienteDAO pacienteDAO) { // inyección: facilita pruebas (DIP)
+    public ServicioPacientes(IPacienteDAO pacienteDAO) { // inyección: facilita pruebas (DIP)
         this.pacienteDAO = pacienteDAO;
     }
  

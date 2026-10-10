@@ -6,6 +6,7 @@ import java.util.List;
 import modelo.Paciente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import dao.IPacienteDAO;
 import dao.PacienteDAO;
 
 /** Pruebas JUnit 5 de las funciones de orden superior (filter, map, reduce). */
@@ -46,5 +47,24 @@ class ServicioPacientesTest {
     void enmascararDocumentoCortoONulo() {
         assertEquals("****", ServicioPacientes.enmascarar(null));
         assertEquals("****", ServicioPacientes.enmascarar("12"));
+    }
+
+    /** DAO falso en memoria: demuestra la inversión de dependencias (no necesita MySQL). */
+    private static class PacienteDAOFalso implements IPacienteDAO {
+        private final List<Paciente> datos;
+        PacienteDAOFalso(List<Paciente> datos) { this.datos = datos; }
+        @Override public boolean registrarPaciente(Paciente p) { return datos.add(p); }
+        @Override public Paciente buscarPorDocumento(String d) { return null; }
+        @Override public Paciente buscarPorUsuario(String u) { return null; }
+        @Override public boolean actualizarPaciente(Paciente p) { return false; }
+        @Override public List<Paciente> listarPacientes() { return datos; }
+    }
+
+    @Test
+    void resumenAdultosFuncionaConUnDaoFalsoSinBaseDeDatos() {
+        ServicioPacientes s = new ServicioPacientes(new PacienteDAOFalso(Arrays.asList(adulto, menor)));
+        List<String> r = s.resumenAdultos();
+        assertEquals(1, r.size());
+        assertTrue(r.get(0).startsWith("Ana Pérez - DNI ******78"));
     }
 }
