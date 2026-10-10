@@ -7,6 +7,8 @@ import dao.PacienteDAO;
 import modelo.Atencion;
 import modelo.HistoriaClinica;
 import modelo.Paciente;
+import seguridad.SeguridadClave;
+import servicio.ServicioPacientes;
  
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -90,11 +92,30 @@ public class PruebasSistema {
                 } else {
                     verificar("4. Registrar una atencion y listarla", false);
                 }
-            } else {
+             } else {
                 verificar("3. Registrar una historia clinica y consultarla", false);
                 verificar("4. Registrar una atencion y listarla", false);
             }
- 
+
+            // ---- Pruebas 5 a 7: protección de contraseñas ----
+            verificar("5. La clave no queda en texto plano",
+                    !SeguridadClave.hashear("clave123").contains("clave123"));
+            verificar("6. Acepta la clave correcta y rechaza la incorrecta",
+                    SeguridadClave.verificar("clave123", SeguridadClave.hashear("clave123"))
+                    && !SeguridadClave.verificar("otra", SeguridadClave.hashear("clave123")));
+            verificar("7. Dos hashes de la misma clave son distintos (sal aleatoria)",
+                    !SeguridadClave.hashear("clave123").equals(SeguridadClave.hashear("clave123")));
+
+            // ---- Pruebas 8 y 9: funciones de orden superior (filter y map) ----
+            List<Paciente> lista = java.util.Arrays.asList(
+                    new Paciente("Ana", "Diaz", "11111111", "2000-01-01", "a", "x"),
+                    new Paciente("Leo", "Paz", "22222222", "2015-01-01", "b", "x"));
+            ServicioPacientes servicio = new ServicioPacientes(pacienteDAO);
+            verificar("8. Filter: solo queda el paciente mayor de edad",
+                    servicio.mayoresDe(lista, 18).size() == 1);
+            verificar("9. Map: el DNI sale enmascarado",
+                    servicio.resumenesProtegidos(lista).get(0).contains("******11"));
+
         } finally {
             limpiar(documentoPrueba);
         }
