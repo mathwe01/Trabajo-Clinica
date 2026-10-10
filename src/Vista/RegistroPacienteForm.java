@@ -5,7 +5,7 @@ import modelo.Paciente;
 import seguridad.SeguridadClave;
 import javax.swing.*;
 import java.awt.*;
- 
+import fabrica.PacienteFactory;
 /**
  * Ventana (formulario) para registrar un paciente.
  * Tiene los campos del paciente y un botón "Guardar" que llama al
@@ -105,8 +105,8 @@ public class RegistroPacienteForm extends JFrame {
         }
  
         // La contraseña se convierte en hash con sal antes de guardarla (Ley N.° 29733)
-        Paciente paciente = new Paciente(nombre, apellido, documento,
-                fechaNacimiento, usuario, SeguridadClave.hashear(contrasena));
+        Paciente paciente = PacienteFactory.crear(nombre, apellido, documento,
+        fechaNacimiento, usuario, contrasena);
  
         boolean guardado = pacienteDAO.registrarPaciente(paciente);
  
